@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=4 uid="uid://rfb2rx2gik1s"]
+[gd_scene load_steps=37 format=4 uid="uid://rfb2rx2gik1s"]
 
 [ext_resource type="Script" uid="uid://drujhi3kyvi2u" path="res://Util/Game_Logic/game_logic.gd" id="1_sqv62"]
 [ext_resource type="PackedScene" uid="uid://jdgl6gpb80es" path="res://Prefab/UI/UI.tscn" id="2_xmh30"]
@@ -17,10 +17,11 @@
 [ext_resource type="PackedScene" uid="uid://ctqaaav1h2efi" path="res://Prefab/Manager/MainManager.tscn" id="15_dhkha"]
 [ext_resource type="PackedScene" uid="uid://cpndxvp5ubsl8" path="res://Prefab/Enemies/Dummy.tscn" id="16_yfflc"]
 [ext_resource type="PackedScene" uid="uid://3iti8rxlsrc2" path="res://Prefab/Enemies/Dino/Dino_Green.tscn" id="17_cwrst"]
-[ext_resource type="Texture2D" uid="uid://c6l4q3ein705v" path="res://Art/Sprites/Dungeon Gathering Free Version/Set 1.png" id="18_xmh30"]
+[ext_resource type="Texture2D" path="res://Art/Sprites/Dungeon Gathering Free Version/tileset_dungeon_recolor.png" id="18_rve4k"]
 [ext_resource type="PackedScene" uid="uid://b0anaegxvegyc" path="res://Prefab/Enemies/Dungeon/Skeleton.tscn" id="19_wmg7a"]
 [ext_resource type="PackedScene" uid="uid://dl603q4umttiw" path="res://Prefab/Enemies/Dungeon/Necromancer.tscn" id="20_n5lmp"]
 [ext_resource type="PackedScene" uid="uid://d0sopd70yisiq" path="res://Prefab/Enemies/Tomatoe/Tomatoe_ennemy.tscn" id="23_ielx5"]
+[ext_resource type="Texture2D" uid="uid://bn7g7a38wmokn" path="res://Art/Sprites/tomatoe/tomatoe_king_v2.png" id="24_rve4k"]
 [ext_resource type="PackedScene" uid="uid://ydi1kxb0dwjn" path="res://Prefab/Enemies/Tomatoe/Tomatoe_king.tscn" id="25_6qujl"]
 [ext_resource type="PackedScene" uid="uid://bpqw8x1m3r7ck" path="res://Prefab/Enemies/Tomatoe/Tomatoe_Seed_Boss.tscn" id="26_seedboss"]
 
@@ -44,23 +45,16 @@ properties/0/replication_mode = 1
 [sub_resource type="Resource" id="Resource_y1vuu"]
 resource_local_to_scene = true
 script = ExtResource("10_58642")
-speed_multiplier = 1.5
-texture = ExtResource("11_n4g6w")
-upgrade_text = "Speed"
 metadata/_custom_type_script = "uid://ml68vemh2d58"
 
 [sub_resource type="Resource" id="Resource_ffjdm"]
 resource_local_to_scene = true
 script = ExtResource("10_58642")
-speed_multiplier = 1.5
-texture = ExtResource("11_n4g6w")
-upgrade_text = "Speed"
 metadata/_custom_type_script = "uid://ml68vemh2d58"
 
 [sub_resource type="Resource" id="Resource_0nudk"]
 resource_local_to_scene = true
 script = ExtResource("13_csvdn")
-damage_bonus = 2.0
 texture = ExtResource("14_bir4h")
 upgrade_text = "Damage"
 metadata/_custom_type_script = "uid://dwuqfrf7ultv5"
@@ -68,7 +62,6 @@ metadata/_custom_type_script = "uid://dwuqfrf7ultv5"
 [sub_resource type="Resource" id="Resource_reuqd"]
 resource_local_to_scene = true
 script = ExtResource("13_csvdn")
-damage_bonus = 2.0
 texture = ExtResource("14_bir4h")
 upgrade_text = "Damage"
 metadata/_custom_type_script = "uid://dwuqfrf7ultv5"
@@ -76,13 +69,10 @@ metadata/_custom_type_script = "uid://dwuqfrf7ultv5"
 [sub_resource type="Resource" id="Resource_ttlqr"]
 resource_local_to_scene = true
 script = ExtResource("10_58642")
-speed_multiplier = 1.5
-texture = ExtResource("11_n4g6w")
-upgrade_text = "Speed"
 metadata/_custom_type_script = "uid://ml68vemh2d58"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wmg7a"]
-texture = ExtResource("18_xmh30")
+texture = ExtResource("18_rve4k")
 21:0/0 = 0
 22:0/0 = 0
 23:0/0 = 0
@@ -492,6 +482,10 @@ replication_config = SubResource("SceneReplicationConfig_w86v4")
 _spawnable_scenes = PackedStringArray("uid://6o6eiydhbvdn")
 spawn_path = NodePath("..")
 
+[node name="PlayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("uid://6o6eiydhbvdn")
+spawn_path = NodePath("..")
+
 [node name="SpeedUpgrade" parent="." instance=ExtResource("9_6qujl")]
 position = Vector2(794, 621)
 bullet_strategy = SubResource("Resource_y1vuu")
@@ -515,7 +509,7 @@ bullet_strategy = SubResource("Resource_ttlqr")
 [node name="Manager" parent="." instance=ExtResource("15_dhkha")]
 
 [node name="Dummy" parent="." instance=ExtResource("16_yfflc")]
-position = Vector2(1101, 267)
+position = Vector2(1137, 245)
 MAX_DEFAULT_HEALTH = 100
 
 [node name="Dino_green" parent="." instance=ExtResource("17_cwrst")]
@@ -542,7 +536,14 @@ position = Vector2(1124, 152)
 position = Vector2(891, 199)
 
 [node name="SeedBoss" parent="." instance=ExtResource("26_seedboss")]
-position = Vector2(558, 299)
+position = Vector2(635, 268)
 
 [node name="Tomatoe_king2" parent="." instance=ExtResource("25_6qujl")]
 position = Vector2(1096, 357)
+
+[node name="TomatoeKingV2" type="Sprite2D" parent="."]
+position = Vector2(743, 274)
+scale = Vector2(5.25, 5.25)
+texture = ExtResource("24_rve4k")
+hframes = 4
+vframes = 4

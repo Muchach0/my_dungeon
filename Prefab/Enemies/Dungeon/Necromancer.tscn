@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dwrvjvtfymngy" path="res://Prefab/Enemies/Enemy.gd" id="1_60wy3"]
 [ext_resource type="Material" uid="uid://bqobf4jtv2a83" path="res://Art/Shaders/RedShader.tres" id="2_vq48d"]
-[ext_resource type="Texture2D" uid="uid://bvb2lwmykdbpo" path="res://Art/Sprites/dungeonSprites_ v1.5/necromancer_.png" id="3_bvix3"]
+[ext_resource type="Texture2D" uid="uid://b2crpvi287pog" path="res://Art/Sprites/recolor/necromancer_recolor.png" id="3_065sq"]
 [ext_resource type="Script" uid="uid://c7n12r1ga5b8m" path="res://Util/Components/hitbox.gd" id="3_ybg60"]
 [ext_resource type="Script" uid="uid://c78lqfuowj4ou" path="res://Util/States/State_machine.gd" id="4_2mn14"]
 [ext_resource type="Script" uid="uid://b2myt44bpyvvy" path="res://Util/States/EnemyIdle.gd" id="5_vq48d"]
@@ -10,7 +10,7 @@
 [ext_resource type="Script" uid="uid://7emw4goubm1q" path="res://Util/States/EnemyFollowing.gd" id="7_abc123"]
 [ext_resource type="Script" uid="uid://deb3r81oga7je" path="res://Util/States/EnemyRangedAttack.gd" id="8_def456"]
 [ext_resource type="PackedScene" uid="uid://hlkjer88mbpu" path="res://Prefab/Components/HealthComponent.tscn" id="9_lvit6"]
-[ext_resource type="Texture2D" uid="uid://b8cdfh3yuu3q2" path="res://Art/Sprites/shadow_circle.png" id="10_1tna6"]
+[ext_resource type="Texture2D" uid="uid://hrdmj1kjxrht" path="res://Art/Sprites/recolor/shadow_circle_recolor.png" id="11_065sq"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_svmlw"]
 radius = 6.5
@@ -143,7 +143,7 @@ _data = {
 }
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_bvix3"]
-radius = 107.001
+radius = 475.50238
 
 [node name="Necromancer" type="CharacterBody2D"]
 material = ExtResource("2_vq48d")
@@ -159,12 +159,13 @@ bullet_speed = 250.0
 metadata/_custom_type_script = "uid://dwrvjvtfymngy"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
 position = Vector2(0.5, 4)
 shape = SubResource("CapsuleShape2D_svmlw")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 use_parent_material = true
-texture = ExtResource("3_bvix3")
+texture = ExtResource("3_065sq")
 hframes = 8
 vframes = 5
 frame = 32
@@ -174,6 +175,7 @@ script = ExtResource("3_ybg60")
 metadata/_custom_type_script = "uid://c7n12r1ga5b8m"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+visible = false
 position = Vector2(0, 4)
 shape = SubResource("CapsuleShape2D_bvix3")
 
@@ -217,9 +219,10 @@ scale = Vector2(0.25, 0.25)
 z_index = -1
 position = Vector2(-1.42109e-14, 12)
 scale = Vector2(0.221971, 0.0982148)
-texture = ExtResource("10_1tna6")
+texture = ExtResource("11_065sq")
 
 [node name="AggroArea2D" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AggroArea2D"]
+visible = false
 shape = SubResource("CircleShape2D_bvix3")

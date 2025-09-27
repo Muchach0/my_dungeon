@@ -2,6 +2,8 @@ extends CanvasLayer
 
 @onready var network_label: Label = $NetworkLabel
 @onready var level_label: Label = $LevelLabel
+@onready var wave_label: Label = $WaveLabel
+@onready var wave_completed_label: Label = $WaveCompletedLabel
 @onready var is_a_game_running_label: Label = $IsAGameRunningLabel
 @onready var bonus_label: Label = $BonusLabel
 
@@ -20,7 +22,7 @@ extends CanvasLayer
 # Game Over related labels
 @onready var game_over_screen: Control = $GameOverScreen
 @onready var game_over_screen_label: Label = $GameOverScreen/Control/Label
-@onready var game_over_screen_button: Button = $GameOverScreen/Control2/Button
+@onready var restart_button: Button = $GameOverScreen/Control2/Button
 
 
 var number_of_players: int = 0
@@ -28,7 +30,7 @@ var number_of_players: int = 0
 func _ready() -> void:
     EventBus.connect("add_player", on_player_added)
     EventBus.connect("remove_player", on_remove_player)
-    EventBus.connect("start_level", on_start_level)
+    # EventBus.connect("start_level", on_start_level)
     EventBus.connect("is_server_running_a_busy_round", on_joining_server_running_a_busy_round)
     EventBus.connect("sync_bonus_count", on_sync_bonus_count)
     EventBus.connect("bonus_used", on_bonus_used)
@@ -41,6 +43,14 @@ func _ready() -> void:
     EventBus.connect("is_server_label_visible", on_is_server_label_visible)
     EventBus.connect("game_over_screen_text_and_visibility", on_game_over_screen_text_and_visibility)
 
+    # Wave related signals
+    EventBus.connect("update_wave_ui", on_update_wave_ui)
+    EventBus.connect("wave_cleared", on_wave_cleared)
+
+    restart_button.pressed.connect(on_restart_button_pressed)
+
+    # Player hidden related signals
+
 
 func on_player_added(_player_id, _player_info) -> void:
     number_of_players += 1
@@ -50,9 +60,6 @@ func on_remove_player(_player_id) -> void:
     number_of_players -= 1
     network_label.text = "Player connected: %d " % number_of_players
 
-func on_start_level(current_level, nb_bullets) -> void:
-    # Update the UI with the current level and number of bullets.
-    level_label.text = "Level: %d - Bullets: %d" % [current_level, nb_bullets]
 
 func on_joining_server_running_a_busy_round(should_display_label: bool) -> void:
     # If the game is currently running, we display the label.
@@ -94,7 +101,7 @@ func on_game_over_screen_text_and_visibility(label_text: String, button_text: St
     if not is_visible:
         game_over_screen.visible = false
     game_over_screen_label.text = label_text
-    game_over_screen_button.text = button_text
+    restart_button.text = button_text
     game_over_screen.visible = is_visible
 
 
@@ -104,3 +111,30 @@ func on_audio_explosion_play() -> void:
 
 func on_audio_win_play() -> void:
     audio_win.play()
+
+
+# func on_start_level(level_number, wave_number, enemy_killed, enemy_total) -> void:
+#     # Update the UI with the current level and number of bullets.
+#     level_label.text = "Level: %d" % level_number
+#     wave_label.text = "Wave: %d - Enemy killed: %d / %d" % [wave_number, enemy_killed, enemy_total]
+
+
+func on_update_wave_ui(level_number: int, wave_number: int, TOTAL_WAVES: int, enemy_killed: int, enemy_total: int) -> void:
+    level_label.text = " Level: %d" % level_number
+    wave_label.text = "Wave: %d / %d - Enemy killed: %d / %d" % [wave_number, TOTAL_WAVES, enemy_killed, enemy_total]
+    if wave_completed_label.visible:
+        wave_completed_label.hide()
+
+
+func on_wave_cleared(wave_number: int, TOTAL_WAVES: int) -> void:
+    wave_completed_label.show()
+    if wave_number >= TOTAL_WAVES:
+        wave_completed_label.text = "Boss incoming!!"
+    else:
+        wave_completed_label.text = "Wave %d completed!" % [wave_number]
+
+
+
+func on_restart_button_pressed() -> void:
+    print("ui.gd - on_restart_button_pressed() - Restart button pressed by player %d" % multiplayer.get_unique_id())
+    EventBus.restart_button_pressed.emit()

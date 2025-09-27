@@ -5,9 +5,9 @@ var enemy: Enemy
 var player: Node2D
 var roll_direction: Vector2
 var roll_speed: float = 400.0
-var roll_duration: float = 2.0
+var roll_duration: float = 8.0
 var roll_timer: float = 0.0
-var damage_on_contact: float = 5.0
+# var damage_on_contact: float = 5.0
 
 var state_animation_name: String = "rolling"
 
@@ -24,9 +24,9 @@ func Enter():
 	roll_direction = (player.global_position - enemy.global_position).normalized()
 	roll_timer = 0.0
 	
-	# Enable collision damage during roll
-	if enemy.hurtbox:
-		enemy.hurtbox.damage = damage_on_contact
+	# # Enable collision damage during roll
+	# if enemy.hurtbox:
+	# 	enemy.hurtbox.damage = damage_on_contact
 	
 	# Play rolling animation
 	if enemy.animation_player and enemy.animation_player.has_animation("rolling"):
@@ -52,10 +52,10 @@ func Physics_Update(_delta: float):
 	enemy.velocity = roll_direction * roll_speed
 	enemy.move_and_slide()
 	
-	# # Handle wall collisions - bounce off walls
-	# if enemy.is_on_wall():
-	# 	var wall_normal = enemy.get_wall_normal()
-	# 	roll_direction = roll_direction.bounce(wall_normal)
+	# Handle wall collisions - bounce off walls
+	if enemy.is_on_wall():
+		var wall_normal = enemy.get_wall_normal()
+		roll_direction = roll_direction.bounce(wall_normal)
 
 func Exit():
 	# Reset collision damage

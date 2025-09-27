@@ -43,12 +43,14 @@ var bonus_number: int = 0 # The number of bonuses picked up by the player
 
 @onready var sync = $MultiplayerSynchronizer
 @onready var camera = $PlayerCamera
-
 @onready var timer_glow: Timer = $TimerGlow
-
+@onready var health_bar: ProgressBar = $HealthBar
 
 func _ready() -> void:
-    material.set_shader_parameter("enable_effect", false)
+    # Duplicate the shader material to make individual modifications
+    if material != null:
+        material = material.duplicate()
+        material.set_shader_parameter("enable_effect", false)
     print("player.gd - _ready() - id: " + str(peer_id) + " - is_multiplayer_authority: " + str(is_multiplayer_authority()))
     EventBus.connect("sync_bonus_count", on_sync_bonus_count)
     EventBus.add_upgrade_to_player.connect(on_add_upgrade_to_player)
@@ -59,6 +61,8 @@ func _ready() -> void:
     setup_camera()
     if timer_glow != null:
         timer_glow.timeout.connect(stop_glow)
+    if health_bar != null:
+        health_bar.value = number_of_life
     # EventBus.connect("player_respawned", _on_player_respawned)
     # The player follows the mouse cursor automatically, so there's no point
     # in displaying the mouse cursor.
@@ -228,21 +232,32 @@ func take_damage(damage:int, from_player_id: int) -> void:
     
     # Check if the bullet belongs to this player (prevent self-damage)
     if peer_id == from_player_id:
-        print("Player avoided self-damage from own bullet")
+        # print("Player avoided self-damage from own bullet")
         return
-    
+
+    sync_take_damage_on_all_peers.rpc(number_of_life, damage, from_player_id)
     # If the player is invincible, we don't want to decrease the number of lives.
     # print("Player touched by a bullet")
     # touching += 1
-    start_glow()
-    number_of_life -= damage
-    print("Player took damage: ", damage, " from player id: ", from_player_id)
-    EventBus.emit_signal("player_hit", name, number_of_life)
-    # if touching >= 1:
-    #     material.set_shader_parameter("enable_effect", true)
-        # sprite.frame = 1
+    # start_glow()
+    # number_of_life -= damage
+    # print("Player took damage: ", damage, " from player id: ", from_player_id)
+    # EventBus.emit_signal("player_hit", name, number_of_life)
+    # # if touching >= 1:
+    # #     material.set_shader_parameter("enable_effect", true)
+    #     # sprite.frame = 1
     return # Replace with function body.
 
+
+@rpc("any_peer", "call_local", "reliable") # Function called on local authority to all players to sync take damage
+func sync_take_damage_on_all_peers(number_of_life_from_owner:int, damage:int, from_player_id: int) -> void:
+    print("player.gd - sync_take_damage_on_all_peers() - Player took damage: ", damage, " from player id: ", from_player_id)
+    number_of_life = number_of_life_from_owner - damage
+    health_bar.value = number_of_life
+    start_glow()
+    var player_owner_id = multiplayer.get_remote_sender_id()
+    EventBus.player_hit.emit(player_owner_id, name, number_of_life)
+    return
 
 func hide_player() -> void:
     # This function is called when the player is hit and should be hidden.
@@ -259,6 +274,8 @@ func hide_player() -> void:
     $Hitbox.monitoring = false
     $Hitbox.monitorable = false
     EventBus.player_died.emit(peer_id)
+    if health_bar != null:
+        health_bar.visible = false
 
 func reset_player(new_position: Vector2) -> void:
     # This function is called when the player is respawned.
@@ -267,7 +284,7 @@ func reset_player(new_position: Vector2) -> void:
     position = new_position
     synced_position = new_position
     number_of_life = INIT_NUMBER_OF_LIFE
-    is_invincible = true  # Reset the invincibility state
+    is_invincible = false  # Reset the invincibility state
     touching = 0  # Reset the number of bullets touching the player
     # Showing the player sprite and enabling the detection area
     $Sprite2D.visible = true
@@ -278,7 +295,9 @@ func reset_player(new_position: Vector2) -> void:
     material.set_shader_parameter("enable_effect", false)
     # Ensure camera is properly set up after respawn
     setup_camera()
-
+    if health_bar != null:
+        health_bar.visible = true
+        health_bar.value = number_of_life
 
 
 ####################### FORCE FIELD SECTION #######################
@@ -344,4 +363,3 @@ func _update_sprite_direction_from_motion(direction: Vector2) -> void:
     # var coords := sprite.frame_coords
     # coords.x = target_hframe
     # sprite.frame_coords = coords
-

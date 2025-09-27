@@ -19,6 +19,8 @@ func _ready():
 func _physics_process(_delta: float) -> void:
     if multiplayer == null or is_multiplayer_authority():
         if Input.is_action_just_pressed("primary_fire"):
+            if player.is_hidden:
+                return
             shoot_primary()
 
 func shoot_primary():

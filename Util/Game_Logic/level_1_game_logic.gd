@@ -26,10 +26,10 @@ const arena_dimension_y = [100, 650]
 # Enemy spawn configuration per wave
 var wave_config = {
     1: {"enemy_count": 3, "enemy_types": ["Dummy"]},
-    2: {"enemy_count": 5, "enemy_types": ["Dummy", "Skeleton"]},
-    3: {"enemy_count": 7, "enemy_types": ["Dummy", "Skeleton", "Necromancer"]},
-    4: {"enemy_count": 8, "enemy_types": ["Dummy", "Skeleton", "Necromancer"]},
-    5: {"enemy_count": 10, "enemy_types": ["Dummy", "Skeleton", "Necromancer", "Tomatoe_ennemy"]}
+    2: {"enemy_count": 3, "enemy_types": ["Necromancer"]},
+    3: {"enemy_count": 3, "enemy_types": ["Tomatoe_ennemy", "Dino_green"]},
+    4: {"enemy_count": 7, "enemy_types": ["Skeleton", "Necromancer", "Tomatoe_ennemy", "Dino_green"]},
+    5: {"enemy_count": 1, "enemy_types": ["Tomatoe_Seed_Boss"]},
 }
 
 # Enemy scene paths
@@ -37,7 +37,9 @@ var enemy_scenes = {
     "Dummy": "res://Prefab/Enemies/Dummy.tscn",
     "Skeleton": "res://Prefab/Enemies/Dungeon/Skeleton.tscn",
     "Necromancer": "res://Prefab/Enemies/Dungeon/Necromancer.tscn",
-    "Tomatoe_ennemy": "res://Prefab/Enemies/Tomatoe/Tomatoe_ennemy.tscn"
+    "Tomatoe_ennemy": "res://Prefab/Enemies/Tomatoe/Tomatoe_ennemy.tscn",
+    "Dino_green": "res://Prefab/Enemies/Dino/Dino_Green.tscn",
+    "Tomatoe_Seed_Boss": "res://Prefab/Enemies/Tomatoe/Tomatoe_Seed_Boss.tscn",
 }
 
 # bool to store if a game with bullets is currently running
@@ -63,6 +65,7 @@ func _ready() -> void:
     # EventBus.connect("bonus_touched", on_bonus_touched_by_player)
     # EventBus.connect("bonus_used", server_handles_bonus_used_by_player)
     EventBus.connect("one_enemy_die", _on_enemy_died)
+    EventBus.connect("restart_button_pressed", _on_button_restart_pressed)
     
     # Setup enemy spawner
     if enemy_spawner:
@@ -103,9 +106,10 @@ func set_player_node_name_and_init_position(player_id, player_node_name, init_po
     if is_a_game_with_bullets_currently_running and is_wave_active:
         print("game_logic.gd - set_player_node_name_and_init_position() - Player joining during active wave")
         # Don't mark as wave_completed - let them participate in current wave
-        show_display_server_busy_label.rpc_id(player_id, is_a_game_with_bullets_currently_running)  # Notify about ongoing game
-        show_current_level_and_wave_info.rpc_id(player_id, current_level, current_wave)  # Show current wave info
-        update_wave_ui.rpc_id(player_id, current_wave, enemies_in_current_wave)  # Show current wave status
+        # show_display_server_busy_label.rpc_id(player_id, is_a_game_with_bullets_currently_running)  # Notify about ongoing game
+        # show_current_level_and_wave_info.rpc_id(player_id, current_level, current_wave, enemies_killed_in_current_wave, enemies_in_current_wave)  # Show current wave info
+        update_wave_ui.rpc_id(player_id, current_level, current_wave, enemies_killed_in_current_wave, enemies_in_current_wave)  # Show current wave status
+
 
 
 
@@ -142,11 +146,13 @@ func remove_player(player_id) -> void:
         finish_game.rpc(true) # Call finish_game with is_win set to true
     
 
-@rpc("any_peer", "call_local", "reliable")
-func player_was_hit(player_name, number_of_life: int) -> void:
+# Called by the authoritative player when a player is hit
+func _on_player_hit(player_owner_id, player_name, number_of_life: int) -> void:
+    print("game_logic - Player hit! Remaining lives: %d" % number_of_life)
+
     EventBus.audio_explosion_play.emit()
     if multiplayer.is_server():
-        players[multiplayer.get_remote_sender_id()]["number_of_life"] = number_of_life
+        players[player_owner_id]["number_of_life"] = number_of_life
         if number_of_life <= 0:
             print("game_logic - Player %s hit and has no lives left, finishing game." % name)
             hide_player_from_server_to_all_peers.rpc(player_name)  # Hide the player from all peers
@@ -156,11 +162,8 @@ func player_was_hit(player_name, number_of_life: int) -> void:
         else:
             print("game_logic - Player %s hit! Remaining lives: %d" % [name, number_of_life])
 
-# Called by the authoritative player when a player is hit
-func _on_player_hit(player_name, number_of_life: int) -> void:
-    print("game_logic - Player hit! Remaining lives: %d" % number_of_life)
     # Handle player hit logic here, e.g., update UI or play sound
-    player_was_hit.rpc(player_name, number_of_life)
+    # player_was_hit.rpc(player_name, number_of_life)
 
 
 
@@ -199,8 +202,7 @@ func restart_game() -> void:
 
     # Reset the game over screen and the server busy label
     # game_over_screen.visible = false
-    EventBus.emit_signal("game_over_screen_text_and_visibility", "", false)
-
+    EventBus.game_over_screen_text_and_visibility.emit("", "Restart", false)
     show_display_server_busy_label(false)  # Hide the server busy label
 
     if multiplayer.is_server():
@@ -224,7 +226,8 @@ func restart_game() -> void:
 
         # Only start waves if there are players
         if len(players) > 0:
-            EventBus.emit_signal("bullets_init_and_start", current_level) # Emit a signal to spawn bullets
+            EventBus.start_level.emit(current_level, current_wave, enemies_killed_in_current_wave, enemies_in_current_wave)
+            # EventBus.emit_signal("bullets_init_and_start", current_level) # Emit a signal to spawn bullets
             start_wave.call_deferred(current_wave) # Start the first wave
         
 
@@ -237,12 +240,12 @@ func finish_game(is_win:= true) -> void:
         # Play win sound
         EventBus.audio_win_play.emit()
         # star.visible = false
-        if current_wave >= TOTAL_WAVES:
-            EventBus.game_over_screen_text_and_visibility.emit("All Waves Completed! Victory!", "Next Level", true)
-        else:
-            EventBus.game_over_screen_text_and_visibility.emit("Victory!", "Next Level", true)
+        # if current_wave >= TOTAL_WAVES:
+        EventBus.game_over_screen_text_and_visibility.emit("Level completed! Victory!", "Restart", true)
+        # else:
+        #     EventBus.game_over_screen_text_and_visibility.emit("Victory!", "Next Level", true)
         # init_bullet_count += INCREMENT_BULLET_COUNT
-        current_level += 1
+        # current_level += 1
     else :
         EventBus.game_over_screen_text_and_visibility.emit("Round Over!", "Restart", true)
 
@@ -411,7 +414,8 @@ func start_first_wave() -> void:
     is_wave_active = false
     
     # Initialize bullets system if needed
-    EventBus.emit_signal("bullets_init_and_start", current_level) # Emit a signal to spawn bullets
+    EventBus.start_level.emit(current_level, current_wave, enemies_killed_in_current_wave, enemies_in_current_wave)
+    # EventBus.emit_signal("bullets_init_and_start", current_level) # Emit a signal to spawn bullets
     
     # Start the first wave
     start_wave(current_wave)
@@ -426,7 +430,8 @@ func _on_enemy_died() -> void:
     
     enemies_killed_in_current_wave += 1
     print("game_logic.gd - _on_enemy_died() - Enemy died. Killed: %d/%d" % [enemies_killed_in_current_wave, enemies_in_current_wave])
-    
+    update_wave_ui.rpc(current_level, current_wave, enemies_killed_in_current_wave, enemies_in_current_wave)
+
     # Check if wave is completed
     if enemies_killed_in_current_wave >= enemies_in_current_wave:
         complete_current_wave()
@@ -451,7 +456,7 @@ func start_wave(wave_number: int) -> void:
         players[peer_id]["wave_completed"] = false
     
     # Notify all clients about the new wave
-    update_wave_ui.rpc(current_wave, enemies_in_current_wave)
+    update_wave_ui.rpc(current_level, current_wave, enemies_killed_in_current_wave, enemies_in_current_wave)
     
     # Spawn enemies
     spawn_enemies(enemy_types, enemies_in_current_wave)
@@ -471,9 +476,9 @@ func _spawn_enemy_callback(data: Dictionary) -> Node:
     enemy.global_position = data.position
     enemy.add_to_group("wave_enemies")  # Add to group for easy tracking
     
-    # Connect enemy death signal if available
-    if enemy.has_signal("enemy_died"):
-        enemy.enemy_died.connect(_on_enemy_died)
+    # # Connect enemy death signal if available
+    # if enemy.has_signal("enemy_died"):
+    #     enemy.enemy_died.connect(_on_enemy_died)
     
     print("game_logic.gd - _spawn_enemy_callback() - Spawned %s at %s" % [enemy_type, data.position])
     return enemy
@@ -513,40 +518,12 @@ func spawn_enemies(enemy_types: Array, count: int) -> void:
                 "position": spawn_position
             }
             enemy = enemy_spawner.spawn(spawn_data)
-        else:
-            # Fallback to direct instantiation (for local testing or when spawner is not configured)
-            enemy = _create_enemy_directly(enemy_type, spawn_position)
         
         if enemy:
             print("game_logic.gd - spawn_enemies() - Spawned %s at %s" % [enemy_type, spawn_position])
         else:
             print("game_logic.gd - spawn_enemies() - Failed to spawn %s" % enemy_type)
 
-# Fallback method for direct enemy creation (when no MultiplayerSpawner is available)
-func _create_enemy_directly(enemy_type: String, spawn_position: Vector2) -> Node:
-    var enemy_scene_path = enemy_scenes.get(enemy_type, "res://Prefab/Enemies/Dummy.tscn")
-    
-    # Load and instantiate enemy
-    var enemy_scene = load(enemy_scene_path)
-    if not enemy_scene:
-        print("game_logic.gd - _create_enemy_directly() - Could not load enemy scene: %s" % enemy_scene_path)
-        return null
-    
-    var enemy = enemy_scene.instantiate()
-    enemy.global_position = spawn_position
-    enemy.add_to_group("wave_enemies")  # Add to group for easy tracking
-    
-    # Set multiplayer authority to server
-    if multiplayer and multiplayer.is_server():
-        enemy.set_multiplayer_authority(1)  # Server is always peer ID 1
-    
-    add_child(enemy)
-    
-    # Connect enemy death signal if available
-    if enemy.has_signal("enemy_died"):
-        enemy.enemy_died.connect(_on_enemy_died)
-    
-    return enemy
 
 # Called when current wave is completed
 func complete_current_wave() -> void:
@@ -555,20 +532,21 @@ func complete_current_wave() -> void:
     
     print("game_logic.gd - complete_current_wave() - Wave %d completed!" % current_wave)
     is_wave_active = false
+    current_wave += 1 # incrementing the current wave counter
     
     # Mark all players as having completed the wave
     for peer_id in players.keys():
         players[peer_id]["wave_completed"] = true
     
     # Check if this was the final wave
-    if current_wave >= TOTAL_WAVES:
+    if current_wave > TOTAL_WAVES:
         print("game_logic.gd - complete_current_wave() - All waves completed! Game won!")
         finish_game.rpc(true)
     else:
         # Start next wave after a short delay
         wave_completed_notification.rpc(current_wave)
         await get_tree().create_timer(3.0).timeout  # 3 second delay between waves
-        start_wave(current_wave + 1)
+        start_wave(current_wave)
 
 # Clear all enemies from the scene
 func clear_all_enemies() -> void:
@@ -583,17 +561,19 @@ func clear_all_enemies() -> void:
             child.queue_free()
 
 @rpc("any_peer", "call_local", "reliable")
-func update_wave_ui(wave_number: int, enemy_count: int) -> void:
-    print("game_logic.gd - update_wave_ui() - Wave %d started with %d enemies" % [wave_number, enemy_count])
+func update_wave_ui(current_level: int, wave_number: int, enemy_killed: int, enemy_total: int) -> void:
+    print("game_logic.gd - update_wave_ui() - Wave %d started with %d enemies" % [wave_number, enemy_total])
+    EventBus.update_wave_ui.emit(current_level, wave_number, TOTAL_WAVES, enemy_killed, enemy_total)
     # TODO: Update UI to show current wave and enemy count
     # This can be connected to EventBus signals for UI updates
     
 @rpc("any_peer", "call_local", "reliable")
 func wave_completed_notification(wave_number: int) -> void:
     print("game_logic.gd - wave_completed_notification() - Wave %d completed!" % wave_number)
+    EventBus.wave_cleared.emit(wave_number, TOTAL_WAVES)
     # TODO: Show wave completion notification in UI
     
-@rpc("any_peer", "reliable")
-func show_current_level_and_wave_info(current_level_from_server: int, current_wave_from_server: int) -> void:
-    EventBus.emit_signal("start_level", current_level_from_server, 99) # Emit a signal to notify the UI to update the current level and number of bullets TODO: MODIFY THIS
-    print("game_logic.gd - show_current_level_and_wave_info() - Level %d, Wave %d" % [current_level_from_server, current_wave_from_server])
+# @rpc("any_peer", "reliable")
+# func show_current_level_and_wave_info(current_level_from_server: int, current_wave_from_server: int, enemies_killed_in_current_wave_from_server: int, enemies_in_current_wave_from_server: int) -> void:
+#     EventBus.start_level.emit(current_level_from_server, current_wave_from_server, enemies_killed_in_current_wave_from_server, enemies_in_current_wave_from_server)
+#     print("game_logic.gd - show_current_level_and_wave_info() - Level %d, Wave %d" % [current_level_from_server, current_wave_from_server])

@@ -2,7 +2,7 @@
 
 [ext_resource type="Material" uid="uid://bqobf4jtv2a83" path="res://Art/Shaders/RedShader.tres" id="1_seed_boss"]
 [ext_resource type="Script" uid="uid://dwrvjvtfymngy" path="res://Prefab/Enemies/Enemy.gd" id="2_seed_boss"]
-[ext_resource type="Texture2D" uid="uid://c4slf3l70qb7k" path="res://Art/Sprites/tomatoe/tomatoe_king_v1.png" id="3_seed_boss"]
+[ext_resource type="Texture2D" uid="uid://bn7g7a38wmokn" path="res://Art/Sprites/tomatoe/tomatoe_king_v2.png" id="3_40nuy"]
 [ext_resource type="Script" uid="uid://b73sir6xbr0gt" path="res://Util/Components/hurtbox.gd" id="4_seed_boss"]
 [ext_resource type="Script" uid="uid://c7n12r1ga5b8m" path="res://Util/Components/hitbox.gd" id="5_seed_boss"]
 [ext_resource type="Script" uid="uid://c78lqfuowj4ou" path="res://Util/States/State_machine.gd" id="6_seed_boss"]
@@ -12,7 +12,7 @@
 [ext_resource type="Script" uid="uid://7emw4goubm1q" path="res://Util/States/EnemyFollowing.gd" id="10_seed_boss"]
 [ext_resource type="Script" uid="uid://bfyarrfnc1tlo" path="res://Util/States/EnemyDying.gd" id="11_seed_boss"]
 [ext_resource type="PackedScene" uid="uid://hlkjer88mbpu" path="res://Prefab/Components/HealthComponent.tscn" id="12_seed_boss"]
-[ext_resource type="Texture2D" uid="uid://b8cdfh3yuu3q2" path="res://Art/Sprites/shadow_circle.png" id="13_seed_boss"]
+[ext_resource type="Texture2D" uid="uid://hrdmj1kjxrht" path="res://Art/Sprites/recolor/shadow_circle_recolor.png" id="13_8j4bu"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_seed_boss_main"]
 radius = 50.0
@@ -234,7 +234,7 @@ _data = {
 }
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_seed_boss_aggro"]
-radius = 300.7
+radius = 1290.5748
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_seed_boss"]
 properties/0/path = NodePath(".:position")
@@ -253,8 +253,9 @@ script = ExtResource("2_seed_boss")
 MAX_DEFAULT_HEALTH = 200
 should_flip_sprite = true
 speed = 150.0
+should_glow_when_hit = false
 can_shoot_bullets = true
-bullet_damage = 4.0
+bullet_damage = 1.0
 bullet_speed = 300.0
 metadata/_custom_type_script = "uid://dwrvjvtfymngy"
 
@@ -266,14 +267,13 @@ shape = SubResource("CapsuleShape2D_seed_boss_main")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 use_parent_material = true
 scale = Vector2(8, 8)
-texture = ExtResource("3_seed_boss")
+texture = ExtResource("3_40nuy")
 hframes = 4
 vframes = 4
 frame = 1
 
 [node name="Hurtbox" type="Area2D" parent="."]
 script = ExtResource("4_seed_boss")
-damage = 5.0
 metadata/_custom_type_script = "uid://b73sir6xbr0gt"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
@@ -330,6 +330,7 @@ scale = Vector2(1.2, 1.2)
 [node name="AggroArea2D" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AggroArea2D"]
+visible = false
 shape = SubResource("CircleShape2D_seed_boss_aggro")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
@@ -339,4 +340,4 @@ replication_config = SubResource("SceneReplicationConfig_seed_boss")
 z_index = -1
 position = Vector2(4, 70)
 scale = Vector2(1.5, 1.2)
-texture = ExtResource("13_seed_boss")
+texture = ExtResource("13_8j4bu")

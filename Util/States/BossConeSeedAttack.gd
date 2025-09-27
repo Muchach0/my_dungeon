@@ -12,7 +12,7 @@ var last_seed_time: float = 0.0
 var cone_angle: float = 60.0  # Total cone angle in degrees
 var num_projectiles: int = 8  # Number of projectiles in cone
 var projectile_speed: float = 300.0
-var seed_damage: float = 3.0
+var seed_damage: float = 1.0
 
 var seed_scene: PackedScene = preload("res://Prefab/Bullet/EnemyBullet.tscn")
 var state_animation_name: String = "attack"
@@ -52,12 +52,12 @@ func Update(delta: float):
 	# Check if attack duration is complete
 	if attack_timer >= attack_duration:
 		# Decide next state based on distance to player
-		var distance_to_player = enemy.global_position.distance_to(player.global_position)
+		# var distance_to_player = enemy.global_position.distance_to(player.global_position)
 		
-		if distance_to_player > 150.0:
-			emit_signal("transitioned", self, "EnemyFollowing")
-		else:
-			emit_signal("transitioned", self, "BossRolling")
+		# if distance_to_player > 150.0:
+		# 	emit_signal("transitioned", self, "EnemyFollowing")
+		# else:
+		emit_signal("transitioned", self, "BossRolling")
 
 func Physics_Update(_delta: float):
 	if not enemy or not player or not is_instance_valid(enemy) or not is_instance_valid(player):

@@ -3,34 +3,27 @@
 [ext_resource type="Script" uid="uid://cowvolnrf8vgn" path="res://Util/Game_Logic/level_1_game_logic.gd" id="1_8yhm2"]
 [ext_resource type="PackedScene" uid="uid://jdgl6gpb80es" path="res://Prefab/UI/UI.tscn" id="2_1fal7"]
 [ext_resource type="PackedScene" uid="uid://4t0v4wxi1jn6" path="res://Prefab/Upgrades/speed_upgrade.tscn" id="9_xub2v"]
+[ext_resource type="Texture2D" uid="uid://lhtw2mljp0wr" path="res://Art/Sprites/recolor/tileset_dungeon_recolor.png" id="10_chwpn"]
 [ext_resource type="Script" uid="uid://ml68vemh2d58" path="res://Util/Upgrade/SpeedBoostStrategy.gd" id="10_x5u8r"]
 [ext_resource type="Texture2D" uid="uid://cksc370vxgcc5" path="res://Art/Sprites/test/carrot.png" id="11_nwpk5"]
 [ext_resource type="PackedScene" uid="uid://cpjfn3h6rvp5d" path="res://Prefab/Upgrades/damage_upgrade.tscn" id="12_lk3dh"]
 [ext_resource type="Script" uid="uid://dwuqfrf7ultv5" path="res://Util/Upgrade/DamageBoostStrategy.gd" id="13_ts4pv"]
 [ext_resource type="Texture2D" uid="uid://dfhk7eqfescwu" path="res://Art/Sprites/test/fish.png" id="14_7sml1"]
 [ext_resource type="PackedScene" uid="uid://ctqaaav1h2efi" path="res://Prefab/Manager/MainManager.tscn" id="15_bd6hb"]
-[ext_resource type="Texture2D" uid="uid://c6l4q3ein705v" path="res://Art/Sprites/Dungeon Gathering Free Version/Set 1.png" id="18_xcdlm"]
 
 [sub_resource type="Resource" id="Resource_y1vuu"]
 resource_local_to_scene = true
 script = ExtResource("10_x5u8r")
-speed_multiplier = 1.5
-texture = ExtResource("11_nwpk5")
-upgrade_text = "Speed"
 metadata/_custom_type_script = "uid://ml68vemh2d58"
 
 [sub_resource type="Resource" id="Resource_ffjdm"]
 resource_local_to_scene = true
 script = ExtResource("10_x5u8r")
-speed_multiplier = 1.5
-texture = ExtResource("11_nwpk5")
-upgrade_text = "Speed"
 metadata/_custom_type_script = "uid://ml68vemh2d58"
 
 [sub_resource type="Resource" id="Resource_0nudk"]
 resource_local_to_scene = true
 script = ExtResource("13_ts4pv")
-damage_bonus = 2.0
 texture = ExtResource("14_7sml1")
 upgrade_text = "Damage"
 metadata/_custom_type_script = "uid://dwuqfrf7ultv5"
@@ -38,7 +31,6 @@ metadata/_custom_type_script = "uid://dwuqfrf7ultv5"
 [sub_resource type="Resource" id="Resource_reuqd"]
 resource_local_to_scene = true
 script = ExtResource("13_ts4pv")
-damage_bonus = 2.0
 texture = ExtResource("14_7sml1")
 upgrade_text = "Damage"
 metadata/_custom_type_script = "uid://dwuqfrf7ultv5"
@@ -46,13 +38,10 @@ metadata/_custom_type_script = "uid://dwuqfrf7ultv5"
 [sub_resource type="Resource" id="Resource_ttlqr"]
 resource_local_to_scene = true
 script = ExtResource("10_x5u8r")
-speed_multiplier = 1.5
-texture = ExtResource("11_nwpk5")
-upgrade_text = "Speed"
 metadata/_custom_type_script = "uid://ml68vemh2d58"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wmg7a"]
-texture = ExtResource("18_xcdlm")
+texture = ExtResource("10_chwpn")
 21:0/0 = 0
 22:0/0 = 0
 23:0/0 = 0
@@ -400,7 +389,7 @@ _spawnable_scenes = PackedStringArray("uid://6o6eiydhbvdn")
 spawn_path = NodePath("..")
 
 [node name="EnemySpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("uid://cpndxvp5ubsl8", "uid://b0anaegxvegyc", "uid://dl603q4umttiw", "uid://d0sopd70yisiq")
+_spawnable_scenes = PackedStringArray("uid://cpndxvp5ubsl8", "uid://b0anaegxvegyc", "uid://dl603q4umttiw", "uid://d0sopd70yisiq", "uid://bpqw8x1m3r7ck", "uid://3iti8rxlsrc2")
 spawn_path = NodePath("..")
 
 [node name="SpeedUpgrade" parent="." instance=ExtResource("9_xub2v")]

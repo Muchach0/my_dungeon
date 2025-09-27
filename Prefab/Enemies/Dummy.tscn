@@ -1,22 +1,27 @@
-[gd_scene load_steps=16 format=3 uid="uid://cpndxvp5ubsl8"]
+[gd_scene load_steps=18 format=3 uid="uid://cpndxvp5ubsl8"]
 
 [ext_resource type="Script" uid="uid://dwrvjvtfymngy" path="res://Prefab/Enemies/Enemy.gd" id="1_60wy3"]
-[ext_resource type="Texture2D" uid="uid://ckxnr6m1ctt2h" path="res://Art/Sprites/enemies/enemy.png" id="2_5oo2h"]
 [ext_resource type="Material" uid="uid://bqobf4jtv2a83" path="res://Art/Shaders/RedShader.tres" id="2_vq48d"]
+[ext_resource type="Texture2D" uid="uid://ig6g35ydmmf" path="res://Art/Sprites/recolor/knight_recolor.png" id="3_b7xrt"]
 [ext_resource type="Script" uid="uid://c7n12r1ga5b8m" path="res://Util/Components/hitbox.gd" id="3_ybg60"]
 [ext_resource type="Script" uid="uid://c78lqfuowj4ou" path="res://Util/States/State_machine.gd" id="4_2mn14"]
+[ext_resource type="Script" uid="uid://b73sir6xbr0gt" path="res://Util/Components/hurtbox.gd" id="4_b7xrt"]
 [ext_resource type="Script" uid="uid://b2myt44bpyvvy" path="res://Util/States/EnemyIdle.gd" id="5_vq48d"]
 [ext_resource type="Script" uid="uid://bfyarrfnc1tlo" path="res://Util/States/EnemyDying.gd" id="6_lvit6"]
 [ext_resource type="PackedScene" uid="uid://hlkjer88mbpu" path="res://Prefab/Components/HealthComponent.tscn" id="8_lvit6"]
-[ext_resource type="Texture2D" uid="uid://b8cdfh3yuu3q2" path="res://Art/Sprites/shadow_circle.png" id="9_1tna6"]
+[ext_resource type="Texture2D" uid="uid://hrdmj1kjxrht" path="res://Art/Sprites/recolor/shadow_circle_recolor.png" id="10_ppc6w"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_svmlw"]
-radius = 78.0
-height = 266.0
+radius = 15.0
+height = 52.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ppc6w"]
+radius = 17.0
+height = 54.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_2mn14"]
-radius = 67.0
-height = 260.0
+radius = 18.0
+height = 58.0
 
 [sub_resource type="Animation" id="Animation_lvit6"]
 length = 0.001
@@ -74,25 +79,37 @@ _data = {
 
 [node name="Dummy" type="CharacterBody2D"]
 material = ExtResource("2_vq48d")
-scale = Vector2(0.25, 0.25)
 script = ExtResource("1_60wy3")
 MAX_DEFAULT_HEALTH = 20
 should_be_able_to_move = false
 metadata/_custom_type_script = "uid://dwrvjvtfymngy"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
 shape = SubResource("CapsuleShape2D_svmlw")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 use_parent_material = true
 rotation = 0.0109894
-texture = ExtResource("2_5oo2h")
+scale = Vector2(3, 3)
+texture = ExtResource("3_b7xrt")
+hframes = 8
+vframes = 5
+
+[node name="Hurtbox" type="Area2D" parent="."]
+script = ExtResource("4_b7xrt")
+metadata/_custom_type_script = "uid://b73sir6xbr0gt"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+visible = false
+shape = SubResource("CapsuleShape2D_ppc6w")
 
 [node name="Hitbox" type="Area2D" parent="."]
 script = ExtResource("3_ybg60")
 metadata/_custom_type_script = "uid://c7n12r1ga5b8m"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+visible = false
 shape = SubResource("CapsuleShape2D_2mn14")
 
 [node name="StateMachine" type="Node" parent="."]
@@ -108,6 +125,7 @@ script = ExtResource("6_lvit6")
 metadata/_custom_type_script = "uid://bfyarrfnc1tlo"
 
 [node name="Timer" type="Timer" parent="."]
+wait_time = 0.8
 
 [node name="TimerAttack" type="Timer" parent="."]
 
@@ -120,10 +138,11 @@ libraries = {
 }
 
 [node name="HealthComponent" parent="." instance=ExtResource("8_lvit6")]
-position = Vector2(0, -168)
+position = Vector2(0, -38)
+scale = Vector2(0.5, 0.5)
 
 [node name="Shadow" type="Sprite2D" parent="."]
 z_index = -1
-position = Vector2(2, 119.5)
-scale = Vector2(2.22222, 1.16667)
-texture = ExtResource("9_1tna6")
+position = Vector2(0, 30)
+scale = Vector2(0.45679012, 0.45932645)
+texture = ExtResource("10_ppc6w")

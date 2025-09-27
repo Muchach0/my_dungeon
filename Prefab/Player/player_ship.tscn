@@ -1,13 +1,13 @@
-[gd_scene load_steps=15 format=3 uid="uid://6o6eiydhbvdn"]
+[gd_scene load_steps=17 format=3 uid="uid://6o6eiydhbvdn"]
 
 [ext_resource type="Material" uid="uid://bqobf4jtv2a83" path="res://Art/Shaders/RedShader.tres" id="1_th7s3"]
 [ext_resource type="Script" uid="uid://8ij4vk5yqwtt" path="res://Prefab/Player/player.gd" id="2_1ilgc"]
-[ext_resource type="Texture2D" uid="uid://dupj3c52e74ko" path="res://Art/Sprites/tomatoe/tomatoe_test_v2_player.png" id="3_i6bba"]
+[ext_resource type="Texture2D" uid="uid://bl50ihvlbeu42" path="res://Art/Sprites/recolor/tomatoe_test_v2_player_recolor.png" id="3_i6bba"]
 [ext_resource type="Script" uid="uid://c78lqfuowj4ou" path="res://Util/States/State_machine.gd" id="4_nm4y3"]
 [ext_resource type="Script" uid="uid://dbfkhxnw14hba" path="res://Util/States/PlayerIdle.gd" id="5_1i7sn"]
 [ext_resource type="Script" uid="uid://dtsmo3xvihwhe" path="res://Util/States/PlayerWandering.gd" id="6_yhkhf"]
-[ext_resource type="Texture2D" uid="uid://b8cdfh3yuu3q2" path="res://Art/Sprites/shadow_circle.png" id="9_7k0sy"]
 [ext_resource type="Texture2D" uid="uid://bj7quaj4iga24" path="res://Art/Sprites/force_field_2.png" id="9_b7j42"]
+[ext_resource type="Texture2D" uid="uid://hrdmj1kjxrht" path="res://Art/Sprites/recolor/shadow_circle_recolor.png" id="9_i6bba"]
 [ext_resource type="Script" uid="uid://cdb1s57g8n15q" path="res://Prefab/Player/player_weapon.gd" id="10_i6bba"]
 [ext_resource type="Script" uid="uid://c7n12r1ga5b8m" path="res://Util/Components/hitbox.gd" id="10_ya4rv"]
 
@@ -28,6 +28,12 @@ radius = 146.055
 [sub_resource type="CircleShape2D" id="CircleShape2D_doahn"]
 radius = 8.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i6bba"]
+bg_color = Color(0.61960787, 0.06666667, 0.06666667, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ya4rv"]
+bg_color = Color(0.1882353, 0.37254903, 0.14117648, 1)
+
 [node name="PlayerShip" type="CharacterBody2D" groups=["Player"]]
 y_sort_enabled = true
 texture_filter = 1
@@ -37,6 +43,7 @@ motion_mode = 1
 script = ExtResource("2_1ilgc")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
 position = Vector2(0, 2)
 shape = SubResource("CircleShape2D_i6bba")
 
@@ -93,18 +100,32 @@ position_smoothing_speed = 10.0
 z_index = -1
 position = Vector2(0, 10)
 scale = Vector2(0.207632, 0.119048)
-texture = ExtResource("9_7k0sy")
+texture = ExtResource("9_i6bba")
 
 [node name="Hitbox" type="Area2D" parent="."]
 script = ExtResource("10_ya4rv")
 metadata/_custom_type_script = "uid://c7n12r1ga5b8m"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+visible = false
 position = Vector2(0, 2)
 shape = SubResource("CircleShape2D_doahn")
 
 [node name="TimerGlow" type="Timer" parent="."]
 wait_time = 0.5
+
+[node name="HealthBar" type="ProgressBar" parent="."]
+offset_left = -11.5
+offset_top = -10.5
+offset_right = 12.0
+offset_bottom = -9.5
+theme_override_styles/background = SubResource("StyleBoxFlat_i6bba")
+theme_override_styles/fill = SubResource("StyleBoxFlat_ya4rv")
+max_value = 5.0
+step = 1.0
+value = 4.0
+rounded = true
+show_percentage = false
 
 [connection signal="timeout" from="ForceFieldArea/ForceFieldTimer" to="." method="_on_force_field_timer_timeout"]
 [connection signal="area_entered" from="Hitbox" to="." method="_on_hitbox_area_entered"]

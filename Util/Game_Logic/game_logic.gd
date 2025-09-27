@@ -102,11 +102,14 @@ func remove_player(player_id) -> void:
         finish_game.rpc(true) # Call finish_game with is_win set to true
     
 
-@rpc("any_peer", "call_local", "reliable")
-func player_was_hit(player_name, number_of_life: int) -> void:
+
+# Called by the authoritative player when a player is hit
+func _on_player_hit(player_owner_id, player_name, number_of_life: int) -> void:
+    print("game_logic - Player hit! Remaining lives: %d" % number_of_life)
+
     EventBus.audio_explosion_play.emit()
     if multiplayer.is_server():
-        players[multiplayer.get_remote_sender_id()]["number_of_life"] = number_of_life
+        players[player_owner_id]["number_of_life"] = number_of_life
         if number_of_life <= 0:
             print("game_logic - Player %s hit and has no lives left, finishing game." % name)
             hide_player_from_server_to_all_peers.rpc(player_name)  # Hide the player from all peers
@@ -116,11 +119,8 @@ func player_was_hit(player_name, number_of_life: int) -> void:
         else:
             print("game_logic - Player %s hit! Remaining lives: %d" % [name, number_of_life])
 
-# Called by the authoritative player when a player is hit
-func _on_player_hit(player_name, number_of_life: int) -> void:
-    print("game_logic - Player hit! Remaining lives: %d" % number_of_life)
     # Handle player hit logic here, e.g., update UI or play sound
-    player_was_hit.rpc(player_name, number_of_life)
+    # player_was_hit.rpc(player_name, number_of_life)
 
 
 

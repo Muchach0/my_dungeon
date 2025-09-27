@@ -29,6 +29,7 @@ var player = null
 # var attack_range = 50 # Range within which enemy attacks
 
 @export var should_be_able_to_move = true
+@export var should_glow_when_hit = true
 
 # Ranged attacking part
 @export var can_shoot_bullets: bool = false
@@ -49,7 +50,7 @@ signal enemy_died
 
 func _ready() -> void:
     if timer != null:
-        timer.timeout.connect(self.queue_free)
+        timer.timeout.connect(delete_enemy)
     if timer_glow != null:
         timer_glow.timeout.connect(stop_glow)
     health = MAX_DEFAULT_HEALTH
@@ -119,7 +120,9 @@ func sync_damage(damage: int, from_player_id:int, health_from_server: int) -> vo
     if health_component != null:
         health_component.update_life_bar(health, damage)
     
-    start_red_glow()
+    if should_glow_when_hit:
+        start_red_glow()
+
     if health <= 0:
         # Emit signal from state machine
         $StateMachine.current_state.emit_signal("transitioned", $StateMachine.current_state, "EnemyDying")
@@ -146,7 +149,7 @@ func die(_from_player_id: int) -> void:
     # hitbox_collision_shape.set_deferred("disabled", true) # Disabling the hitbox when the ennemy is dying
     # hurtbox_collision_shape.set_deferred("disabled", true) # Disabling the hurtbox when the ennemy is dying
 
-    emit_signal("enemy_died")
+    emit_signal("enemy_died") # Not used right now - signal handling is done via the EventBus signal below (one_enemy_die)
     EventBus.emit_signal("one_enemy_die")
     EventBus.emit_signal("update_score", score_given_by_this_enemy, _from_player_id)
     # update_score()
@@ -156,6 +159,11 @@ func die(_from_player_id: int) -> void:
     # $Sprite.visible = false
     timer.start()
 
+# Function to delete the enemy - used when the enemy is killed by the player
+func delete_enemy() -> void:
+    if not multiplayer or not multiplayer.is_server():
+        return
+    queue_free()
 
 #================ ATTACK PART ================
 func attack_landed():

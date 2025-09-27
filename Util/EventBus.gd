@@ -17,6 +17,9 @@ signal is_server_running_a_busy_round # Signal to indicate if a game is currentl
 # UI related signals
 signal is_server_label_visible # Signal to notify the UI that the server label should be visible or not
 signal game_over_screen_text_and_visibility # Signal to notify the UI that the game over screen text and visibility should be updated
+signal update_wave_ui # Signal to notify the UI that the wave number and enemy count should be updated
+signal restart_button_pressed # Signal to notify the UI that the restart button has been pressed
+signal wave_cleared # Signal to notify the UI that the wave has been cleared
 
 # Signal linked to bonus
 signal bonus_touched # Signal to notify the game logic that a player touched a bonus
