@@ -1,27 +1,27 @@
 @PHONY: all build run clean export-client-html docker-client-build-run docker-client-run docker-client-rm docker-client-update gcp-trigger-build gcp-init-dns
 
-DOCKER_IMAGE_CLIENT = muchachoo/get-started
-DOCKER_IMAGE_SERVER = muchachoo/get-started-server
+DOCKER_IMAGE_CLIENT = muchachoo/my-dungeon
+DOCKER_IMAGE_SERVER = muchachoo/my-dungeon-server
 DOCKER_IMAGE_TAG = 1
-GCP_CLOUD_RUN_SERVICE_CLIENT = get-started-client
-GCP_CLOUD_RUN_SERVICE_SERVER = get-started-server
+GCP_CLOUD_RUN_SERVICE_CLIENT = my-dungeon-client
+GCP_CLOUD_RUN_SERVICE_SERVER = my-dungeon-server
 DNS_ZONE = muchacho-app
-DNS_NAME_CLIENT = get-started.muchacho.app
-DNS_NAME_SERVER = get-started-server.muchacho.app
+DNS_NAME_CLIENT = my-dungeon.muchacho.app
+DNS_NAME_SERVER = my-dungeon-server.muchacho.app
 
 CURRENT_BUILD_VERSION_FILE_PATH = builds/build_version.cfg
 CURRENT_VERSION = $(shell cat $(CURRENT_BUILD_VERSION_FILE_PATH))
 NEXT_VERSION = $(shell echo $$(($(CURRENT_VERSION) + 1)))
 DOCKER_IMAGE_VERSION = v$(NEXT_VERSION)
-LINUX_BINARY = get-started_linux_export.x86_64
+LINUX_BINARY = my-dungeon_linux_export.x86_64
 
 
 # ========================== LOCAL CLIENT SECTION (no docker) =========================
 export-linux:
-	../Godot_v4.4.1-stable_linux.x86_64 --headless --path $(shell pwd) --export-release "Linux" $(shell pwd)/builds/linux/$(LINUX_BINARY)
+	../Godot_v4.5-stable_linux.x86_64 --headless --path $(shell pwd) --export-release "Linux" $(shell pwd)/builds/linux/$(LINUX_BINARY)
 
 export-client-html:
-	../Godot_v4.4.1-stable_linux.x86_64 --headless --path $(shell pwd) --export-release "Web" $(shell pwd)/builds/client-html/index.html
+	../Godot_v4.5-stable_linux.x86_64 --headless --path $(shell pwd) --export-release "Web" $(shell pwd)/builds/client-html/index.html
 
 run-server-linux: 
 	$(shell pwd)/builds/linux/$(LINUX_BINARY) --server
@@ -88,7 +88,7 @@ add-google-analytics:
 	# awk '/<\/head>/ { system("cat $(shell pwd)/builds/google_analytics.html"); print; next } { print }' builds/client-html/index.html > temp.html  && mv temp.html builds/client-html/index.html
 
 # gcp-init-docker-registry: 
-# 	gcloud artifacts repositories create get-started-game --repository-format=docker --location=europe-west1 --description="My Snake Game Docker Repository"
+# 	gcloud artifacts repositories create my-dungeon-game --repository-format=docker --location=europe-west1 --description="My Snake Game Docker Repository"
 
 gcp-trigger-build-client: export-client-html add-google-analytics push-new-docker-image-client ## Trigger GCP build
 	@echo "Using Docker image:  $(DOCKER_IMAGE_CLIENT):v$(CURRENT_VERSION)"
