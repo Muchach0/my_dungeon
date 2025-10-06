@@ -39,14 +39,23 @@ var bullet_scene: PackedScene = preload("res://Prefab/Bullet/EnemyBullet.tscn")
 
 # Attacking part
 var is_attack_on_cooldown = false
+@export var attack_cooldown: float = 1.0
 @onready var timer_attack_cooldown : Timer = $TimerAttack if has_node("TimerAttack") else null
-@onready var hurtbox := $Hurtbox if has_node("Hurtbox") else null
+@onready var hurtbox := $Sprite2D/Hurtbox if has_node("Sprite2D/Hurtbox") else null
 # @onready var hitbox_collision_shape := $HitBox/CollisionShape2D if has_node("HitBox/CollisionShape2D") else null
-@onready var hurtbox_collision_shape := $Hurtbox/CollisionShape2D if has_node("Hurtbox/CollisionShape2D") else null
+@onready var hurtbox_collision_shape := $Sprite2D/Hurtbox/CollisionShape2D if has_node("Sprite2D/Hurtbox/CollisionShape2D") else null
+@onready var melee_attack_range_area := $Sprite2D/MeleeAttackRangeArea2D if has_node("Sprite2D/MeleeAttackRangeArea2D") else null
 
+# Melee attack configuration
+@export var can_melee_attack: bool = true
+@onready var is_any_player_in_melee_range: bool = false
+
+# Useful for flipping the sprite
+@onready var init_scale: Vector2 = $Sprite2D.scale
 # puppet var puppet_position = Vector2()
 
 signal enemy_died
+signal player_in_melee_range
 
 func _ready() -> void:
     if timer != null:
@@ -72,6 +81,7 @@ func _ready() -> void:
         print_debug("Enemy.gd - _ready - hurtbox is null")
     if timer_attack_cooldown != null:
         print_debug("Enemy.gd - _ready - timer_attack_cooldown is not null")
+        timer_attack_cooldown.wait_time = attack_cooldown
         timer_attack_cooldown.timeout.connect(reset_cooldown)
     else:
         print_debug("Enemy.gd - _ready - timer_attack_cooldown is null")
@@ -79,12 +89,20 @@ func _ready() -> void:
     if animation_player != null: # To keep playing the animation of the state machine when the animation is finished.
         animation_player.animation_finished.connect(_on_animation_player_animation_finished)
 
+    if melee_attack_range_area != null:
+        melee_attack_range_area.body_entered.connect(_on_melee_attack_range_area_body_entered)
+        melee_attack_range_area.body_exited.connect(_on_melee_attack_range_area_body_exited)
+
 func flip_sprite(flip: bool) -> void:
     if not should_flip_sprite: # do nothing if the enemy should not flip the sprite
         return
-    sprite.flip_h = flip
-    for child_sprite in sprite.get_children():
-        child_sprite.flip_h = flip 
+    # Flip the spite by changing the x scale (instead of flip_h as we want the children to flip as well)
+    # The hurtbox and the attack melee range should be flipped as well.
+    if flip:
+        sprite.scale.x = -init_scale.x
+    else:
+        sprite.scale.x = init_scale.x
+    # sprite.flip_h = flip <-- does not flip the children as well
 
 # ================ TAKING DAMAGE PART ================
 func stop_glow() -> void:
@@ -174,18 +192,30 @@ func attack_landed():
     # hitbox_collision_shape.disabled = true
     timer_attack_cooldown.start()
 
+    # Notify the current state if it's a melee attack state
+    var current_state = $StateMachine.current_state
+    if current_state != null and current_state.has_method("on_attack_hit"):
+        current_state.on_attack_hit()
+
+    if can_melee_attack: # if melee attack is enabled, managed by the EnemyMeleeAttack state
+        return
+    play_attack_animation()
+
+func play_attack_animation():
     if animation_player == null :
         return
     if not animation_player.has_animation("attack"):
         return
-
+    print_debug("Enemy.gd - play_attack_animation - Playing attack animation")
+    # animation_player.stop(true)
     animation_player.play("attack")
-
 
 func reset_cooldown():
     print_debug("Enemy.gd - reset_cooldown - reseting cooldown")
     is_attack_on_cooldown = false
     # hurtbox.set_deferred("disabled", false)
+    if can_melee_attack: # if melee attack is enabled, the hurtbox is managed by the attack animation
+        return
     hurtbox_collision_shape.set_deferred("disabled", false) # Disabling the hitbox when we landed an attack
     # hitbox_collision_shape.disabled = false
     
@@ -218,13 +248,44 @@ func shoot_bullet(direction: Vector2) -> void:
     
     print_debug("Enemy.gd - shoot_bullet - Bullet shot in direction: ", direction)
 
-func can_melee_attack() -> bool:
-    """Check if this enemy can perform melee attacks"""
-    return hurtbox != null
+
+#================ MELEE ATTACK PART ================
+func _on_melee_attack_range_area_body_entered(body: Node2D) -> void:
+    print_debug("%d - Enemy.gd - _on_melee_attack_range_area_body_entered - Player entered melee attack range" % multiplayer.get_unique_id())
+    if body.is_in_group("Player"):
+        print_debug("%d - Enemy.gd - _on_melee_attack_range_area_body_entered - Body is player" % multiplayer.get_unique_id())
+        is_any_player_in_melee_range = true
+        player_in_melee_range.emit(true) 
+
+func _on_melee_attack_range_area_body_exited(_body: Node2D) -> void:
+    # if body.is_in_group("Player"):
+    # # Check if we have still bodies player in the area
+    #     if melee_attack_range_area.get_overlapping_bodies().size() == 0:
+    #         player_in_melee_range.emit(false) 
+    var bodies = melee_attack_range_area.get_overlapping_bodies()
+    for body_remaining in bodies:
+        if body_remaining.is_in_group("Player"):
+            is_any_player_in_melee_range = true
+            player_in_melee_range.emit(true) 
+            return
+    
+    is_any_player_in_melee_range = false
+    player_in_melee_range.emit(false) 
+
+#================ END OF MELEE ATTACK PART ================
+
 
 
 func _on_animation_player_animation_finished(anim_name: StringName) -> void:
     print_debug("Enemy.gd - _on_animation_player_animation_finished - Animation finished: ", anim_name)
+    
+    # Handle melee attack completion
+    if anim_name == "attack":
+        var current_state = $StateMachine.current_state
+        if current_state != null and current_state.has_method("complete_attack"):
+            current_state.complete_attack()
+    
+    # Resume state animation
     var new_animation = $StateMachine.current_state.state_animation_name
     if new_animation == null:
         return

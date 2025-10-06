@@ -26,9 +26,9 @@ const arena_dimension_y = [100, 650]
 # Enemy spawn configuration per wave
 var wave_config = {
     1: {"enemy_count": 3, "enemy_types": ["Dummy"]},
-    2: {"enemy_count": 3, "enemy_types": ["Necromancer"]},
-    3: {"enemy_count": 3, "enemy_types": ["Tomatoe_ennemy", "Dino_green"]},
-    4: {"enemy_count": 7, "enemy_types": ["Skeleton", "Necromancer", "Tomatoe_ennemy", "Dino_green"]},
+    2: {"enemy_count": 3, "enemy_types": ["Orc"]},
+    3: {"enemy_count": 3, "enemy_types": ["Necromancer"]},
+    4: {"enemy_count": 7, "enemy_types": ["Skeleton", "Necromancer", "Tomatoe_ennemy", "Dino_green", "Orc"]},
     5: {"enemy_count": 1, "enemy_types": ["Tomatoe_Seed_Boss"]},
 }
 
@@ -40,6 +40,7 @@ var enemy_scenes = {
     "Tomatoe_ennemy": "res://Prefab/Enemies/Tomatoe/Tomatoe_ennemy.tscn",
     "Dino_green": "res://Prefab/Enemies/Dino/Dino_Green.tscn",
     "Tomatoe_Seed_Boss": "res://Prefab/Enemies/Tomatoe/Tomatoe_Seed_Boss.tscn",
+    "Orc": "res://Prefab/Enemies/Test/Orc_Melee_Attack.tscn",
 }
 
 # bool to store if a game with bullets is currently running

@@ -18,6 +18,8 @@ func Enter():
     print_debug("EnemyRangedAttack.gd - Enter - Entering ranged attack state")
     enemy = get_parent().get_parent() # Getting the enemy node
     player = enemy.player
+    # Get initial direction to player
+    direction_to_player = (player.global_position - enemy.global_position).normalized()
     
     # Connect to player death signal
     if not EventBus.is_connected("player_died", player_died):
@@ -69,7 +71,7 @@ func flip_sprite_if_necessary():
         enemy.flip_sprite(false)
 
 func perform_ranged_attack():
-    print_debug("EnemyRangedAttack.gd - perform_ranged_attack - Shooting at player")
+    print_debug("%d - EnemyRangedAttack.gd - perform_ranged_attack - Shooting at player" % multiplayer.get_unique_id())
     
     # Play attack animation if available
     if enemy.animation_player != null and enemy.animation_player.has_animation("ranged_attack"):

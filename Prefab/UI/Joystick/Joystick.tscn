@@ -66,6 +66,7 @@ grow_vertical = 2
 texture = ExtResource("2_tkw83")
 
 [node name="Control2" type="Control" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0

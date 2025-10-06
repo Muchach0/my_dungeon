@@ -102,7 +102,7 @@ position = Vector2(0, 10)
 scale = Vector2(0.207632, 0.119048)
 texture = ExtResource("9_i6bba")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="." groups=["player_hitbox"]]
 script = ExtResource("10_ya4rv")
 metadata/_custom_type_script = "uid://c7n12r1ga5b8m"
 

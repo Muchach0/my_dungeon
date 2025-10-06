@@ -68,6 +68,13 @@ var _touch_index : int = -1
 func _ready() -> void:
     if not DisplayServer.is_touchscreen_available() and visibility_mode == VisibilityMode.TOUCHSCREEN_ONLY:
         hide()
+    add_to_group("virtual_joystick")
+
+func get_active_touch_index() -> int:
+    return _touch_index
+
+func contains_point(point: Vector2) -> bool:
+    return _is_point_inside_joystick_area(point)
 
 func _input(event: InputEvent) -> void:
     if event is InputEventScreenTouch:

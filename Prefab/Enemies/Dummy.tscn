@@ -82,6 +82,7 @@ material = ExtResource("2_vq48d")
 script = ExtResource("1_60wy3")
 MAX_DEFAULT_HEALTH = 20
 should_be_able_to_move = false
+can_melee_attack = false
 metadata/_custom_type_script = "uid://dwrvjvtfymngy"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -96,11 +97,13 @@ texture = ExtResource("3_b7xrt")
 hframes = 8
 vframes = 5
 
-[node name="Hurtbox" type="Area2D" parent="."]
+[node name="Hurtbox" type="Area2D" parent="Sprite2D"]
+rotation = -0.0109894
+scale = Vector2(0.3333333, 0.3333333)
 script = ExtResource("4_b7xrt")
 metadata/_custom_type_script = "uid://b73sir6xbr0gt"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/Hurtbox"]
 visible = false
 shape = SubResource("CapsuleShape2D_ppc6w")
 

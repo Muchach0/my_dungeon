@@ -143,7 +143,7 @@ _data = {
 }
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_bvix3"]
-radius = 475.50238
+radius = 393.80515
 
 [node name="Necromancer" type="CharacterBody2D"]
 material = ExtResource("2_vq48d")
@@ -156,6 +156,7 @@ should_be_able_to_move = false
 can_shoot_bullets = true
 bullet_damage = 3.0
 bullet_speed = 250.0
+can_melee_attack = false
 metadata/_custom_type_script = "uid://dwrvjvtfymngy"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

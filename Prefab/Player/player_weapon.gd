@@ -16,14 +16,22 @@ func _ready():
     if not bullet_manager:
         push_error("BulletManager not found! Make sure it's added to the scene and in 'bullet_manager' group.")
 
-func _physics_process(_delta: float) -> void:
-    if multiplayer == null or is_multiplayer_authority():
-        if Input.is_action_just_pressed("primary_fire"):
-            if player.is_hidden:
-                return
-            shoot_primary()
+# Handles input from mouse (PC) and touch (Mobile)
+func _unhandled_input(event: InputEvent) -> void:
+    # Only handle input if we are the authority (or single player)
+    if not (multiplayer == null or is_multiplayer_authority()):
+        return
+    if player.is_hidden:
+        return
+    # PC: left mouse click; Mobile: screen touch
+    if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+        shoot_primary()
+    elif event is InputEventScreenTouch and event.pressed:
+        # For touch input, we need to get the touch position
+        var touch_position = event.position
+        shoot_primary(touch_position)
 
-func shoot_primary():
+func shoot_primary(mobile_touch_position: Vector2 = Vector2.ZERO):
     # Check cooldown
     var current_time = Time.get_unix_time_from_system()
     if current_time - last_shot_time < shot_cooldown:
@@ -31,9 +39,14 @@ func shoot_primary():
     
     last_shot_time = current_time
     
-    var mouse_position := get_global_mouse_position()
-    var mouse_direction : Vector2 = (mouse_position - player.global_position).normalized()
-    
+    var mouse_direction : Vector2 = Vector2.ZERO # Direction of the mouse or touch position
+
+    if mobile_touch_position != Vector2.ZERO:
+        mouse_direction = (mobile_touch_position - player.global_position).normalized()
+    else:
+        var mouse_position := get_global_mouse_position()
+        mouse_direction = (mouse_position - player.global_position).normalized()
+        
     # Prepare bullet data with upgrade effects
     var bullet_data = {
         "damage": 5.0,
@@ -54,21 +67,21 @@ func shoot_primary():
     # Request authoritative bullet spawn from server
     if bullet_manager:
         bullet_manager.request_bullet_spawn.rpc(player.global_position, mouse_direction, bullet_data)
-    else:
-        # Fallback to old system if bullet manager not available
-        _fallback_shoot_primary(mouse_direction)
+#     else:
+#         # Fallback to old system if bullet manager not available
+#         _fallback_shoot_primary(mouse_direction)
 
-func _fallback_shoot_primary(mouse_direction: Vector2):
-    """Fallback to old bullet system if BulletManager not available"""
-    var spawned_bullet = bullet_scene.instantiate()
-    get_tree().root.add_child(spawned_bullet)
+# func _fallback_shoot_primary(mouse_direction: Vector2):
+#     """Fallback to old bullet system if BulletManager not available"""
+#     var spawned_bullet = bullet_scene.instantiate()
+#     get_tree().root.add_child(spawned_bullet)
     
-    spawned_bullet.global_position = player.global_position
-    spawned_bullet.rotation = mouse_direction.angle()
-    spawned_bullet.shooter_id = player.peer_id  # Set shooter ID to prevent self-damage
+#     spawned_bullet.global_position = player.global_position
+#     spawned_bullet.rotation = mouse_direction.angle()
+#     spawned_bullet.shooter_id = player.peer_id  # Set shooter ID to prevent self-damage
 
-    # Apply strategy upgrades
-    if player.bullet_strategies and player.bullet_strategies.size() > 0:
-        for strategy in player.bullet_strategies:
-            if strategy and strategy.has_method("apply_upgrade"):
-                strategy.apply_upgrade(spawned_bullet)
+#     # Apply strategy upgrades
+#     if player.bullet_strategies and player.bullet_strategies.size() > 0:
+#         for strategy in player.bullet_strategies:
+#             if strategy and strategy.has_method("apply_upgrade"):
+#                 strategy.apply_upgrade(spawned_bullet)
