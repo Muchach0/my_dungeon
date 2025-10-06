@@ -10,11 +10,26 @@ var bullet_scene : PackedScene = preload("res://Prefab/Bullet/Bullet.tscn")
 var last_shot_time: float = 0.0
 var shot_cooldown: float = 0.1  # 100ms between shots
 
+# Continuous firing state
+var is_mouse_pressed: bool = false
+var last_touch_position: Vector2 = Vector2.ZERO
+
 func _ready():
     # Find bullet manager in scene
     bullet_manager = get_tree().get_first_node_in_group("bullet_manager")
     if not bullet_manager:
         push_error("BulletManager not found! Make sure it's added to the scene and in 'bullet_manager' group.")
+
+func _process(_delta):
+    # Continuous firing while mouse/touch is held down
+    if is_mouse_pressed and not player.is_hidden:
+        # Only handle input if we are the authority (or single player)
+        if multiplayer == null or is_multiplayer_authority():
+            # Use current touch position for mobile, current mouse position for PC
+            if last_touch_position != Vector2.ZERO:
+                shoot_primary(last_touch_position)
+            else:
+                shoot_primary()
 
 # Handles input from mouse (PC) and touch (Mobile)
 func _unhandled_input(event: InputEvent) -> void:
@@ -23,13 +38,28 @@ func _unhandled_input(event: InputEvent) -> void:
         return
     if player.is_hidden:
         return
-    # PC: left mouse click; Mobile: screen touch
-    if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-        shoot_primary()
-    elif event is InputEventScreenTouch and event.pressed:
-        # For touch input, we need to get the touch position
-        var touch_position = event.position
-        shoot_primary(touch_position)
+    
+    # PC: left mouse button press/release
+    if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+        if event.pressed:
+            is_mouse_pressed = true
+            shoot_primary()  # Shoot immediately on press
+        else:
+            is_mouse_pressed = false
+    
+    # Mobile: screen touch press/release
+    elif event is InputEventScreenTouch:
+        if event.pressed:
+            is_mouse_pressed = true
+            last_touch_position = event.position
+            shoot_primary(last_touch_position)  # Shoot immediately on touch
+        else:
+            is_mouse_pressed = false
+            last_touch_position = Vector2.ZERO  # Reset touch position
+    
+    # Mobile: screen drag to update touch position during continuous firing
+    elif event is InputEventScreenDrag and is_mouse_pressed:
+        last_touch_position = event.position
 
 func shoot_primary(mobile_touch_position: Vector2 = Vector2.ZERO):
     # Check cooldown
