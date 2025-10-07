@@ -18,7 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://cpndxvp5ubsl8" path="res://Prefab/Enemies/Dummy.tscn" id="16_yfflc"]
 [ext_resource type="PackedScene" uid="uid://c2vu4if27jxev" path="res://Prefab/Enemies/Tomatoe/Tomatoe_Mage_Boss.tscn" id="17_e7ayw"]
 [ext_resource type="Texture2D" uid="uid://lhtw2mljp0wr" path="res://Art/Sprites/recolor/tileset_dungeon_recolor.png" id="18_rve4k"]
-[ext_resource type="PackedScene" uid="uid://bx52rdi2ehujf" path="res://Prefab/Enemies/Test/Orc_Melee_Attack.tscn" id="19_y5jwf"]
+[ext_resource type="PackedScene" uid="uid://mdb5hoqaf1rq" path="res://Prefab/Enemies/Orc.tscn" id="20_6k3pt"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_w2sp8"]
 radius = 40.9132
@@ -512,5 +512,5 @@ position = Vector2(725, 182)
 [node name="Dummy" parent="." instance=ExtResource("16_yfflc")]
 position = Vector2(372, 328)
 
-[node name="Orc_melee_attack" parent="." instance=ExtResource("19_y5jwf")]
-position = Vector2(426, 413)
+[node name="Orc" parent="." instance=ExtResource("20_6k3pt")]
+position = Vector2(766, 202)

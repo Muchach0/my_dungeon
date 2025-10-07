@@ -40,7 +40,7 @@ var enemy_scenes = {
     "Tomatoe_ennemy": "res://Prefab/Enemies/Tomatoe/Tomatoe_ennemy.tscn",
     "Dino_green": "res://Prefab/Enemies/Dino/Dino_Green.tscn",
     "Tomatoe_Seed_Boss": "res://Prefab/Enemies/Tomatoe/Tomatoe_Seed_Boss.tscn",
-    "Orc": "res://Prefab/Enemies/Test/Orc_Melee_Attack.tscn",
+    "Orc": "res://Prefab/Enemies/Orc.tscn",
 }
 
 # bool to store if a game with bullets is currently running
