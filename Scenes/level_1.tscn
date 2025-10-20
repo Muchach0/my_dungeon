@@ -389,7 +389,7 @@ _spawnable_scenes = PackedStringArray("uid://6o6eiydhbvdn")
 spawn_path = NodePath("..")
 
 [node name="EnemySpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("uid://cpndxvp5ubsl8", "uid://b0anaegxvegyc", "uid://dl603q4umttiw", "uid://d0sopd70yisiq", "uid://bpqw8x1m3r7ck", "uid://3iti8rxlsrc2", "uid://mdb5hoqaf1rq")
+_spawnable_scenes = PackedStringArray("uid://cpndxvp5ubsl8", "uid://b0anaegxvegyc", "uid://dbowps5qkmhfv", "uid://d0sopd70yisiq", "uid://bpqw8x1m3r7ck", "uid://3iti8rxlsrc2", "uid://mdb5hoqaf1rq")
 spawn_path = NodePath("..")
 
 [node name="SpeedUpgrade" parent="." instance=ExtResource("9_xub2v")]

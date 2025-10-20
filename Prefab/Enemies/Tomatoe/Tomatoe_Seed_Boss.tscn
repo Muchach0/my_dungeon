@@ -2,7 +2,7 @@
 
 [ext_resource type="Material" uid="uid://bqobf4jtv2a83" path="res://Art/Shaders/RedShader.tres" id="1_seed_boss"]
 [ext_resource type="Script" uid="uid://dwrvjvtfymngy" path="res://Prefab/Enemies/Enemy.gd" id="2_seed_boss"]
-[ext_resource type="Texture2D" uid="uid://bn7g7a38wmokn" path="res://Art/Sprites/tomatoe/tomatoe_king_v2.png" id="3_40nuy"]
+[ext_resource type="Texture2D" uid="uid://bywqgddjnsqp2" path="res://Art/Sprites/tomatoe/tomatoe_king_v3.png" id="3_40nuy"]
 [ext_resource type="Script" uid="uid://b73sir6xbr0gt" path="res://Util/Components/hurtbox.gd" id="4_seed_boss"]
 [ext_resource type="Script" uid="uid://c7n12r1ga5b8m" path="res://Util/Components/hitbox.gd" id="5_seed_boss"]
 [ext_resource type="Script" uid="uid://c78lqfuowj4ou" path="res://Util/States/State_machine.gd" id="6_seed_boss"]
@@ -38,7 +38,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [1]
+"values": [0]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -66,7 +66,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.5, 0.75),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
-"values": [8, 9, 10, 9]
+"values": [10, 11, 12, 11]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -93,7 +93,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.15),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [4, 6]
+"values": [5, 7]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -145,7 +145,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.2, 0.4, 0.566667),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
-"values": [6, 6, 6, 4]
+"values": [7, 7, 7, 5]
 }
 
 [sub_resource type="Animation" id="Animation_seed_boss_idle"]
@@ -158,10 +158,10 @@ tracks/0/path = NodePath("Sprite2D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.25, 0.5, 0.75),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 1,
-"values": [1, 2, 3, 0]
+"values": [0, 4, 2, 3, 1]
 }
 
 [sub_resource type="Animation" id="Animation_seed_boss_rolling"]
@@ -190,7 +190,7 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [7]
+"values": [8]
 }
 
 [sub_resource type="Animation" id="Animation_seed_boss_walk"]
@@ -269,9 +269,8 @@ shape = SubResource("CapsuleShape2D_seed_boss_main")
 use_parent_material = true
 scale = Vector2(8, 8)
 texture = ExtResource("3_40nuy")
-hframes = 4
+hframes = 5
 vframes = 4
-frame = 1
 
 [node name="Hurtbox" type="Area2D" parent="Sprite2D"]
 scale = Vector2(0.12499999, 0.12499999)

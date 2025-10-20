@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=4 uid="uid://rfb2rx2gik1s"]
+[gd_scene load_steps=29 format=4 uid="uid://rfb2rx2gik1s"]
 
 [ext_resource type="Script" uid="uid://drujhi3kyvi2u" path="res://Util/Game_Logic/game_logic.gd" id="1_sqv62"]
 [ext_resource type="PackedScene" uid="uid://jdgl6gpb80es" path="res://Prefab/UI/UI.tscn" id="2_xmh30"]
@@ -6,7 +6,6 @@
 [ext_resource type="Material" uid="uid://5slcagwnqqij" path="res://Art/Shaders/Glowing.tres" id="4_n5lmp"]
 [ext_resource type="Texture2D" uid="uid://ce3i324ntjxh3" path="res://Art/Sprites/star_2.png" id="5_plg07"]
 [ext_resource type="PackedScene" uid="uid://r4el6umoyi8v" path="res://Prefab/BulletShower/bullets.tscn" id="6_hled0"]
-[ext_resource type="Texture2D" uid="uid://bkby2e0hkghxd" path="res://Art/Sprites/placeholder.svg" id="7_ielx5"]
 [ext_resource type="Texture2D" uid="uid://2vbmwrfbswhb" path="res://Art/Sprites/bonus.png" id="8_7u4hm"]
 [ext_resource type="PackedScene" uid="uid://4t0v4wxi1jn6" path="res://Prefab/Upgrades/speed_upgrade.tscn" id="9_6qujl"]
 [ext_resource type="Script" uid="uid://ml68vemh2d58" path="res://Util/Upgrade/SpeedBoostStrategy.gd" id="10_58642"]
@@ -15,19 +14,15 @@
 [ext_resource type="Script" uid="uid://dwuqfrf7ultv5" path="res://Util/Upgrade/DamageBoostStrategy.gd" id="13_csvdn"]
 [ext_resource type="Texture2D" uid="uid://dfhk7eqfescwu" path="res://Art/Sprites/test/fish.png" id="14_bir4h"]
 [ext_resource type="PackedScene" uid="uid://ctqaaav1h2efi" path="res://Prefab/Manager/MainManager.tscn" id="15_dhkha"]
-[ext_resource type="PackedScene" uid="uid://cpndxvp5ubsl8" path="res://Prefab/Enemies/Dummy.tscn" id="16_yfflc"]
 [ext_resource type="PackedScene" uid="uid://c2vu4if27jxev" path="res://Prefab/Enemies/Tomatoe/Tomatoe_Mage_Boss.tscn" id="17_e7ayw"]
 [ext_resource type="Texture2D" uid="uid://lhtw2mljp0wr" path="res://Art/Sprites/recolor/tileset_dungeon_recolor.png" id="18_rve4k"]
-[ext_resource type="PackedScene" uid="uid://mdb5hoqaf1rq" path="res://Prefab/Enemies/Orc.tscn" id="20_6k3pt"]
+[ext_resource type="PackedScene" uid="uid://dbowps5qkmhfv" path="res://Prefab/Enemies/Tomatoe/Tomatoe_Wizard.tscn" id="23_2sp6q"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_w2sp8"]
 radius = 40.9132
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3wjhk"]
 size = Vector2(1598, 159)
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_p0w5i"]
-radius = 20.6155
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4bnm5"]
 radius = 13.0
@@ -442,18 +437,6 @@ position = Vector2(3, -23)
 position = Vector2(795, 162.5)
 shape = SubResource("RectangleShape2D_3wjhk")
 
-[node name="MyBullet" type="Node2D" parent="."]
-position = Vector2(431, 115)
-
-[node name="CharacterBody2D" type="CharacterBody2D" parent="MyBullet"]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MyBullet/CharacterBody2D"]
-shape = SubResource("CircleShape2D_p0w5i")
-
-[node name="Sprite2D" type="Sprite2D" parent="MyBullet"]
-scale = Vector2(0.24, 0.24)
-texture = ExtResource("7_ielx5")
-
 [node name="Bonus" type="Area2D" parent="." groups=["bonus"]]
 position = Vector2(1363, 256)
 
@@ -477,23 +460,23 @@ _spawnable_scenes = PackedStringArray("uid://6o6eiydhbvdn")
 spawn_path = NodePath("..")
 
 [node name="SpeedUpgrade" parent="." instance=ExtResource("9_6qujl")]
-position = Vector2(794, 621)
+position = Vector2(794, 786)
 bullet_strategy = SubResource("Resource_y1vuu")
 
 [node name="SpeedUpgrade2" parent="." instance=ExtResource("9_6qujl")]
-position = Vector2(872, 613)
+position = Vector2(872, 778)
 bullet_strategy = SubResource("Resource_ffjdm")
 
 [node name="DamageUpgrade" parent="." instance=ExtResource("12_46yr7")]
-position = Vector2(724, 619)
+position = Vector2(724, 784)
 bullet_strategy = SubResource("Resource_0nudk")
 
 [node name="DamageUpgrade2" parent="." instance=ExtResource("12_46yr7")]
-position = Vector2(637, 613)
+position = Vector2(637, 778)
 bullet_strategy = SubResource("Resource_reuqd")
 
 [node name="SpeedUpgrade3" parent="." instance=ExtResource("9_6qujl")]
-position = Vector2(562, 607)
+position = Vector2(562, 772)
 bullet_strategy = SubResource("Resource_ttlqr")
 
 [node name="Manager" parent="." instance=ExtResource("15_dhkha")]
@@ -509,8 +492,5 @@ tile_set = SubResource("TileSet_sqv62")
 visible = false
 position = Vector2(725, 182)
 
-[node name="Dummy" parent="." instance=ExtResource("16_yfflc")]
-position = Vector2(372, 328)
-
-[node name="Orc" parent="." instance=ExtResource("20_6k3pt")]
-position = Vector2(766, 202)
+[node name="Tomatoe_Wizard" parent="." instance=ExtResource("23_2sp6q")]
+position = Vector2(719, 297)

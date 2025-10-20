@@ -6,5 +6,3 @@ Play it here: [https://my-dungeon.muchacho.app/](https://my-dungeon.muchacho.app
 
 # Screenshot
 ![Screenshot of the gameplay](docs/screenshots/screenshot_1.png)
-
-
