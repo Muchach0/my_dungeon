@@ -154,7 +154,6 @@ should_flip_sprite = true
 speed = 150.0
 should_be_able_to_move = false
 can_shoot_bullets = true
-bullet_damage = 0.0
 bullet_speed = 250.0
 can_melee_attack = false
 metadata/_custom_type_script = "uid://dwrvjvtfymngy"

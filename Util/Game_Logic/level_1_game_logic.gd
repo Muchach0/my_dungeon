@@ -20,7 +20,7 @@ var enemies_in_current_wave := 0
 var enemies_killed_in_current_wave := 0
 var is_wave_active := false
 
-const arena_dimension_x = [250, 1150]
+const arena_dimension_x = [250, 850]
 const arena_dimension_y = [100, 650]
 
 # Enemy spawn configuration per wave

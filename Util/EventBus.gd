@@ -48,7 +48,9 @@ signal one_enemy_die # Signal to notify the game logic that an enemy has died
 signal update_score # Signal to notify the game logic that the score should be updated
 
 
-
+# Level selection related signals
+signal level_selected # Signal to notify the game logic that a level has been selected
+signal level_started # Signal to notify the game logic that the level should be started
 
 
 
